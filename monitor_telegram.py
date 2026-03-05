@@ -17,7 +17,9 @@ palavras = [
 "Correeeeeeeee",
 "Correeeeeeeeee",
 "Correeeeeeeeeee",
-"Correeeeeeeeeeee"
+"Correeeeeeeeeeee",
+"Whey"
+    
 ]
 
 client = TelegramClient(
@@ -81,6 +83,7 @@ async def main():
         except Exception as e:
             print("⚠ Conexão perdida. Tentando reconectar...")
             await asyncio.sleep(5)
+
 
 
 asyncio.run(main())
