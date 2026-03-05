@@ -5,8 +5,6 @@ from telethon import TelegramClient, events
 api_id = 39830316
 api_hash = "801694a8767bb74ce2998044ccf111f7"
 
-# ===== CONFIGURAÇÕES =====
-
 USAR_FILTRO_PRECO = False
 
 CONJUNTOS = [
@@ -21,10 +19,6 @@ PRECOS_MAX = {
     "pasta": 25
 }
 
-links_enviados = set()
-
-# ===== CLIENT =====
-
 client = TelegramClient(
     "monitor",
     api_id,
@@ -33,91 +27,69 @@ client = TelegramClient(
     retry_delay=5
 )
 
-# ===== FUNÇÃO PREÇO =====
-
 def extrair_preco(texto):
 
-    padrao = r"\d+[.,]?\d*"
+    padrao = r'(\d{1,4}[,.]\d{2})'
+
     numeros = re.findall(padrao, texto)
 
-    for n in numeros:
-        valor = n.replace(",", ".")
-
-        try:
-            return float(valor)
-        except:
-            pass
+    if numeros:
+        valor = numeros[0].replace(",", ".")
+        return float(valor)
 
     return None
 
 
-# ===== MONITOR =====
-
-@client.on(events.NewMessage(incoming=True))
+@client.on(events.NewMessage)
 async def monitor(event):
 
-    texto_original = event.raw_text or ""
-    texto = texto_original.lower()
-
-    if not texto:
+    if not event.raw_text:
         return
 
-    chat = await event.get_chat()
+    texto = event.raw_text.lower()
 
-    nome_grupo = getattr(chat, "title", None)
+    for conjunto in CONJUNTOS:
 
-    if not nome_grupo:
-        nome_grupo = getattr(chat, "first_name", "Chat privado")
-
-    link = ""
-
-    if hasattr(chat, "username") and chat.username:
-        link = f"https://t.me/{chat.username}/{event.id}"
-
-    if link in links_enviados:
-        return
-
-    for grupo in CONJUNTOS:
-
-        if all(p in texto for p in grupo):
+        if all(p.lower() in texto for p in conjunto):
 
             preco = extrair_preco(texto)
 
-            if USAR_FILTRO_PRECO:
+            if USAR_FILTRO_PRECO and preco:
 
-                palavra_principal = grupo[0]
+                for produto in PRECOS_MAX:
 
-                if preco and palavra_principal in PRECOS_MAX:
+                    if produto in texto:
 
-                    if preco > PRECOS_MAX[palavra_principal]:
-                        return
+                        if preco > PRECOS_MAX[produto]:
+                            return
 
-            links_enviados.add(link)
+            chat = await event.get_chat()
+
+            nome_grupo = getattr(chat, "title", "Chat privado")
+
+            link = ""
+
+            if hasattr(chat, "username") and chat.username:
+                link = f"https://t.me/{chat.username}/{event.id}"
 
             alerta = f"""
-🔥 POSSÍVEL PROMOÇÃO
-
-🛒 Produto detectado: {' + '.join(grupo)}
-
-💰 Preço detectado: {preco}
+🚨 Promoção encontrada
 
 📢 Grupo: {nome_grupo}
 
 💬 Mensagem:
-{texto_original}
+{event.raw_text}
+
+💰 Preço detectado: {preco}
 
 🔗 Link:
 {link}
 """
 
-            print(alerta)
-
             await client.send_message("me", alerta)
 
             break
 
-
-# ===== LOOP =====
 
 async def main():
 
@@ -128,14 +100,9 @@ async def main():
     while True:
         try:
             await client.run_until_disconnected()
-
-        except Exception as e:
-
+        except Exception:
             print("⚠ Reconectando...")
-            print(e)
-
             await asyncio.sleep(5)
 
 
 asyncio.run(main())
-
