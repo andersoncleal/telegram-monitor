@@ -29,49 +29,37 @@ client = TelegramClient(
 )
 
 def extrair_preco(texto):
-
     padrao = r'(\d{1,4}[,.]\d{2})'
-
     numeros = re.findall(padrao, texto)
-
     if numeros:
         valor = numeros[0].replace(",", ".")
         return float(valor)
-
     return None
 
 
 @client.on(events.NewMessage)
 async def monitor(event):
-
     if not event.raw_text:
         return
 
     texto = event.raw_text.lower()
 
     for conjunto in CONJUNTOS:
-
         if all(p.lower() in texto for p in conjunto):
 
-            preco = extrair_preco(texto)
-
-            if USAR_FILTRO_PRECO and preco:
-
-                for produto in PRECOS_MAX:
-
-                    if produto in texto:
-
-                        if preco > PRECOS_MAX[produto]:
-                            return
+            preco = None
+            # Só extrai preço se o filtro estiver ativo
+            if USAR_FILTRO_PRECO:
+                preco = extrair_preco(texto)
+                if preco is not None:
+                    # Checa preço máximo por produto
+                    for produto in PRECOS_MAX:
+                        if produto in texto and preco > PRECOS_MAX[produto]:
+                            return  # ignora mensagem acima do limite
 
             chat = await event.get_chat()
-
             nome_grupo = getattr(chat, "title", "Chat privado")
-
-            link = ""
-
-            if hasattr(chat, "username") and chat.username:
-                link = f"https://t.me/{chat.username}/{event.id}"
+            link = f"https://t.me/{chat.username}/{event.id}" if getattr(chat, "username", None) else ""
 
             alerta = f"""
 🚨 Promoção encontrada
@@ -80,24 +68,20 @@ async def monitor(event):
 
 💬 Mensagem:
 {event.raw_text}
-
-💰 Preço detectado: {preco}
-
-🔗 Link:
-{link}
 """
+            if preco is not None:
+                alerta += f"\n💰 Preço detectado: {preco}"
+
+            if link:
+                alerta += f"\n\n🔗 Link:\n{link}"
 
             await client.send_message("me", alerta)
-
             break
 
 
 async def main():
-
     await client.start()
-
     print("✅ Bot monitorando promoções...")
-
     while True:
         try:
             await client.run_until_disconnected()
@@ -107,4 +91,3 @@ async def main():
 
 
 asyncio.run(main())
-
