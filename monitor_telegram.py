@@ -12,7 +12,7 @@ CONJUNTOS = [
     ["corre"],
     ["whey", "100%"],
     ["jordan"],
-    ["preco historico"]
+    ["historico"]
 ]
 
 PRECOS_MAX = {
@@ -110,4 +110,5 @@ async def main():
 
 
 asyncio.run(main())
+
 
