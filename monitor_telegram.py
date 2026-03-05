@@ -12,7 +12,7 @@ USAR_FILTRO_PRECO = False
 CONJUNTOS = [
     ["bug"],
     ["corre"],
-    ["whey", "100%]
+    ["whey", "100%"]
 ]
 
 PRECOS_MAX = {
@@ -138,3 +138,4 @@ async def main():
 
 
 asyncio.run(main())
+
