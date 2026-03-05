@@ -5,31 +5,18 @@ api_id = 39830316
 api_hash = "801694a8767bb74ce2998044ccf111f7"
 
 palavras = [
-"Bug",
-"Corre",
-"Corree",
-"Correee",
-"Correeee",
-"Correeeee",
-"Correeeeee",
-"Correeeeeee",
-"Correeeeeeee",
-"Correeeeeeeee",
-"Correeeeeeeeee",
-"Correeeeeeeeeee",
-"Correeeeeeeeeeee",
-"Whey"
-    
+"bug",
+"corre",
+"whey"
 ]
 
 client = TelegramClient(
     "monitor",
     api_id,
     api_hash,
-    connection_retries=None,  # reconectar infinito
+    connection_retries=None,
     retry_delay=5
 )
-
 
 @client.on(events.NewMessage)
 async def monitor(event):
@@ -74,16 +61,16 @@ async def monitor(event):
 async def main():
 
     await client.start()
+    await client.connect()
 
     print("✅ Monitorando mensagens...")
 
     while True:
         try:
             await client.run_until_disconnected()
-        except Exception as e:
+        except Exception:
             print("⚠ Conexão perdida. Tentando reconectar...")
             await asyncio.sleep(5)
-
 
 
 asyncio.run(main())
