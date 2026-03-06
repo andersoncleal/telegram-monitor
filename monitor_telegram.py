@@ -27,7 +27,7 @@ client = TelegramClient(
     auto_reconnect=True
 )
 
-USAR_FILTRO_PRECO = False
+USAR_FILTRO_PRECO = true
 
 CONJUNTOS = [
     ["bug"],
@@ -48,9 +48,9 @@ CONJUNTOS = [
 ]
 
 PRECOS_MAX = {
-    "whey": 80,
-    "creatina": 90,
-    "pasta": 25
+    "whey": 85,
+    "creatina": 40,
+    "jordan": 400
 }
 
 # -------- NOVO BLOCO ADICIONADO --------
@@ -258,4 +258,5 @@ async def main():
 if __name__ == "__main__":
 
     asyncio.run(main())
+
 
