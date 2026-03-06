@@ -3,13 +3,19 @@ import re
 import hashlib
 import urllib.parse
 import urllib.request
+import os
+
 from telethon import TelegramClient, events
+from telethon.sessions import StringSession
 
 api_id = 39830316
 api_hash = "801694a8767bb74ce2998044ccf111f7"
 
 BOT_TOKEN = "8614974695:AAEYfpkXzmIN-_qgPovELdO8aX8E01TpvGY"
 CHAT_ID = 27139211
+
+# sessão segura via variável de ambiente
+SESSION = os.getenv("TG_SESSION")
 
 USAR_FILTRO_PRECO = False
 
@@ -39,8 +45,9 @@ PRECOS_MAX = {
 
 mensagens_processadas = set()
 
+# CLIENTE TELEGRAM (SEM ARQUIVO SESSION)
 client = TelegramClient(
-    "session",
+    StringSession(SESSION),
     api_id,
     api_hash,
     connection_retries=None,
@@ -213,3 +220,4 @@ async def main():
 if __name__ == "__main__":
 
     asyncio.run(main())
+
