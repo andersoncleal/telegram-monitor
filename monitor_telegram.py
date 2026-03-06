@@ -39,13 +39,13 @@ PRECOS_MAX = {
 
 mensagens_processadas = set()
 
-# sessão criada apenas no container
 client = TelegramClient(
-    "railway_session",
+    "session",
     api_id,
     api_hash,
     connection_retries=None,
-    retry_delay=5
+    retry_delay=5,
+    auto_reconnect=True
 )
 
 
@@ -166,14 +166,18 @@ async def monitor(event):
                 if preco and preco > PRECOS_MAX[produto]:
                     return
 
-    nome_grupo = event.chat.title if event.chat else "Chat privado"
-
-    nome_grupo = getattr(chat, "title", "Chat privado")
+    # usa dados já presentes no evento (não chama API)
+    if event.chat:
+        nome_grupo = getattr(event.chat, "title", "Chat privado")
+        username = getattr(event.chat, "username", None)
+    else:
+        nome_grupo = "Chat privado"
+        username = None
 
     link = ""
 
-    if getattr(chat, "username", None):
-        link = f"https://t.me/{chat.username}/{event.id}"
+    if username:
+        link = f"https://t.me/{username}/{event.id}"
 
     alerta = f"""
 🚨 Promoção encontrada
@@ -209,5 +213,3 @@ async def main():
 if __name__ == "__main__":
 
     asyncio.run(main())
-
-
