@@ -8,7 +8,7 @@ from telethon import TelegramClient, events
 api_id = 39830316
 api_hash = "801694a8767bb74ce2998044ccf111f7"
 
-BOT_TOKEN = "SEU_TOKEN_AQUI"
+BOT_TOKEN = "8614974695:AAEYfpkXzmIN-_qgPovELdO8aX8E01TpvGY"
 CHAT_ID = 27139211
 
 USAR_FILTRO_PRECO = False
@@ -209,3 +209,4 @@ async def main():
 if __name__ == "__main__":
 
     asyncio.run(main())
+
