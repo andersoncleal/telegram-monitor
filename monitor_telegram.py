@@ -56,7 +56,8 @@ PRECOS_MAX = {
 # -------- NOVO BLOCO ADICIONADO --------
 PALAVRAS_IGNORAR = [
     "iphone",
-    "olimpikus",
+    "olympikus",
+    "olimpikys",
     "macbook"
 ]
 # --------------------------------------
@@ -257,3 +258,4 @@ async def main():
 if __name__ == "__main__":
 
     asyncio.run(main())
+
