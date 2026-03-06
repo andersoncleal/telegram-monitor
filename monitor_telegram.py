@@ -128,7 +128,7 @@ async def monitor(event):
         alerta += f"\n🔗 Link:\n{link}"
 
     # envia alerta
-    await client.send_message("me", alerta)
+    await client.send_message(27139211, alerta)
 
     # salva mensagem como já enviada
     mensagens_processadas.add(msg_id)
@@ -156,3 +156,4 @@ while True:
         print("🔄 Reconectando em 5 segundos...")
 
         asyncio.sleep(5)
+
