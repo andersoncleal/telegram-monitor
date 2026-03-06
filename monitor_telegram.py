@@ -136,6 +136,9 @@ def verificar_palavras(texto):
 @client.on(events.NewMessage)
 async def monitor(event):
 
+    # ignora mensagens do chat onde o bot envia alertas
+    if event.chat_id == CHAT_ID:
+    return
     # evita loop com mensagens do próprio bot
     if event.out:
         return
@@ -218,3 +221,4 @@ async def main():
 if __name__ == "__main__":
 
     asyncio.run(main())
+
