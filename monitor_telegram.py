@@ -1,9 +1,15 @@
 import asyncio
 import re
+import requests
+import hashlib
+import time
 from telethon import TelegramClient, events
 
 api_id = 39830316
 api_hash = "801694a8767bb74ce2998044ccf111f7"
+
+BOT_TOKEN = "SEU_TOKEN_AQUI"
+CHAT_ID = 27139211
 
 USAR_FILTRO_PRECO = False
 
@@ -20,7 +26,6 @@ PRECOS_MAX = {
     "pasta": 25
 }
 
-# memória de mensagens já enviadas
 mensagens_processadas = set()
 
 client = TelegramClient(
@@ -30,6 +35,21 @@ client = TelegramClient(
     connection_retries=10,
     retry_delay=5
 )
+
+
+def enviar_alerta(msg):
+
+    url = f"https://api.telegram.org/bot{BOT_TOKEN}/sendMessage"
+
+    payload = {
+        "chat_id": CHAT_ID,
+        "text": msg
+    }
+
+    try:
+        requests.post(url, data=payload, timeout=10)
+    except Exception as e:
+        print("Erro ao enviar alerta:", e)
 
 
 def extrair_preco(texto):
@@ -54,17 +74,52 @@ def extrair_preco(texto):
     return None
 
 
-def verificar_palavras(texto):
+# NORMALIZA TEXTO
+def normalizar_texto(texto):
 
     texto = texto.lower()
 
+    # remove emojis e pontuação
+    texto = re.sub(r"[^\w\s%$]", " ", texto)
+
+    # remove múltiplos espaços
+    texto = re.sub(r"\s+", " ", texto)
+
+    return texto.strip()
+
+
+# VERIFICA PALAVRAS EXATAS
+def verificar_palavras(texto):
+
+    texto = normalizar_texto(texto)
+
+    palavras_texto = texto.split()
+
     for conjunto in CONJUNTOS:
 
-        if all(p.lower() in texto for p in conjunto):
+        encontrou_todas = True
 
+        for palavra in conjunto:
+
+            palavra = palavra.lower()
+
+            if palavra not in palavras_texto:
+                encontrou_todas = False
+                break
+
+        if encontrou_todas:
             return conjunto
 
     return None
+
+
+def gerar_hash_promocao(texto):
+
+    texto = texto.lower().strip()
+
+    texto = re.sub(r"\s+", " ", texto)
+
+    return hashlib.md5(texto.encode()).hexdigest()
 
 
 @client.on(events.NewMessage)
@@ -75,18 +130,17 @@ async def monitor(event):
     if not mensagem:
         return
 
-    # evita repetir mensagens
-    msg_id = f"{event.chat_id}-{event.id}"
+    promo_hash = gerar_hash_promocao(mensagem)
 
-    if msg_id in mensagens_processadas:
+    if promo_hash in mensagens_processadas:
         return
 
-    texto = mensagem.lower()
-
-    conjunto = verificar_palavras(texto)
+    conjunto = verificar_palavras(mensagem)
 
     if not conjunto:
         return
+
+    texto = mensagem.lower()
 
     preco = None
 
@@ -127,11 +181,9 @@ async def monitor(event):
     if link:
         alerta += f"\n🔗 Link:\n{link}"
 
-    # envia alerta
-    await client.send_message(27139211, alerta)
+    enviar_alerta(alerta)
 
-    # salva mensagem como já enviada
-    mensagens_processadas.add(msg_id)
+    mensagens_processadas.add(promo_hash)
 
 
 async def iniciar():
@@ -155,5 +207,4 @@ while True:
 
         print("🔄 Reconectando em 5 segundos...")
 
-        asyncio.sleep(5)
-
+        time.sleep(5)
