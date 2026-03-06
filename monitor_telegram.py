@@ -1,8 +1,9 @@
 import asyncio
 import re
-import requests
 import hashlib
 import time
+import urllib.parse
+import urllib.request
 from telethon import TelegramClient, events
 
 api_id = 39830316
@@ -48,18 +49,24 @@ client = TelegramClient(
 )
 
 
+# ENVIO DE ALERTA SEM REQUESTS
 def enviar_alerta(msg):
 
-    url = f"https://api.telegram.org/bot{BOT_TOKEN}/sendMessage"
-
-    payload = {
-        "chat_id": CHAT_ID,
-        "text": msg
-    }
-
     try:
-        requests.post(url, data=payload, timeout=10)
+
+        url = f"https://api.telegram.org/bot{BOT_TOKEN}/sendMessage"
+
+        data = urllib.parse.urlencode({
+            "chat_id": CHAT_ID,
+            "text": msg
+        }).encode()
+
+        req = urllib.request.Request(url, data=data)
+
+        urllib.request.urlopen(req)
+
     except Exception as e:
+
         print("Erro ao enviar alerta:", e)
 
 
@@ -85,21 +92,17 @@ def extrair_preco(texto):
     return None
 
 
-# NORMALIZA TEXTO
 def normalizar_texto(texto):
 
     texto = texto.lower()
 
-    # remove emojis e pontuação
     texto = re.sub(r"[^\w\s%$]", " ", texto)
 
-    # remove múltiplos espaços
     texto = re.sub(r"\s+", " ", texto)
 
     return texto.strip()
 
 
-# VERIFICA PALAVRAS EXATAS
 def verificar_palavras(texto):
 
     texto = normalizar_texto(texto)
@@ -108,17 +111,15 @@ def verificar_palavras(texto):
 
     for conjunto in CONJUNTOS:
 
-        encontrou_todas = True
+        encontrou = True
 
         for palavra in conjunto:
 
-            palavra = palavra.lower()
-
-            if palavra not in palavras_texto:
-                encontrou_todas = False
+            if palavra.lower() not in palavras_texto:
+                encontrou = False
                 break
 
-        if encontrou_todas:
+        if encontrou:
             return conjunto
 
     return None
@@ -219,4 +220,3 @@ while True:
         print("🔄 Reconectando em 5 segundos...")
 
         time.sleep(5)
-
