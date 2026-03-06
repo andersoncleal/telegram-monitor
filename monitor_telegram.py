@@ -11,8 +11,7 @@ CONJUNTOS = [
     ["bug"],
     ["corre"],
     ["whey", "100%"],
-    ["jordan"],
-    ["historico"]
+    ["jordan"]
 ]
 
 PRECOS_MAX = {
@@ -21,23 +20,49 @@ PRECOS_MAX = {
     "pasta": 25
 }
 
+# memória de mensagens já enviadas
+mensagens_processadas = set()
+
 client = TelegramClient(
     "monitor",
     api_id,
     api_hash,
-    connection_retries=None,
+    connection_retries=10,
     retry_delay=5
 )
 
+
 def extrair_preco(texto):
 
-    padrao = r'(\d{1,4}[,.]\d{2})'
+    regex = r'(?:R\$|r\$)\s?\d+[.,]?\d*'
 
-    numeros = re.findall(padrao, texto)
+    match = re.search(regex, texto)
 
-    if numeros:
-        valor = numeros[0].replace(",", ".")
-        return float(valor)
+    if match:
+
+        valor = match.group()
+
+        valor = valor.replace("R$", "").replace("r$", "").strip()
+
+        valor = valor.replace(",", ".")
+
+        try:
+            return float(valor)
+        except:
+            return None
+
+    return None
+
+
+def verificar_palavras(texto):
+
+    texto = texto.lower()
+
+    for conjunto in CONJUNTOS:
+
+        if all(p.lower() in texto for p in conjunto):
+
+            return conjunto
 
     return None
 
@@ -45,70 +70,89 @@ def extrair_preco(texto):
 @client.on(events.NewMessage)
 async def monitor(event):
 
-    if not event.raw_text:
+    mensagem = event.raw_text
+
+    if not mensagem:
         return
 
-    texto = event.raw_text.lower()
+    # evita repetir mensagens
+    msg_id = f"{event.chat_id}-{event.id}"
 
-    for conjunto in CONJUNTOS:
+    if msg_id in mensagens_processadas:
+        return
 
-        if all(p.lower() in texto for p in conjunto):
+    texto = mensagem.lower()
 
-            preco = extrair_preco(texto)
+    conjunto = verificar_palavras(texto)
 
-            if USAR_FILTRO_PRECO:
-                preco = extrair_preco(texto)
+    if not conjunto:
+        return
 
-                for produto in PRECOS_MAX:
+    preco = None
 
-                    if produto in texto:
+    if USAR_FILTRO_PRECO:
 
-                        if preco > PRECOS_MAX[produto]:
-                            return
+        preco = extrair_preco(mensagem)
 
-            chat = await event.get_chat()
+        for produto in PRECOS_MAX:
 
-            nome_grupo = getattr(chat, "title", "Chat privado")
+            if produto in texto:
 
-            link = ""
+                if preco and preco > PRECOS_MAX[produto]:
+                    return
 
-            if hasattr(chat, "username") and chat.username:
-                link = f"https://t.me/{chat.username}/{event.id}"
+    chat = await event.get_chat()
 
-            alerta = f"""
+    nome_grupo = getattr(chat, "title", "Chat privado")
+
+    link = ""
+
+    if getattr(chat, "username", None):
+        link = f"https://t.me/{chat.username}/{event.id}"
+
+    alerta = f"""
 🚨 Promoção encontrada
 
 📢 Grupo: {nome_grupo}
 
+🔎 Palavras detectadas: {' + '.join(conjunto)}
+
 💬 Mensagem:
-{event.raw_text}
-
-if preco:
-    mensagem_alerta += f"\n💰 Preço detectado: {preco}"
-
-🔗 Link:
-{link}
+{mensagem}
 """
 
-            await client.send_message("me", alerta)
+    if preco:
+        alerta += f"\n💰 Preço detectado: {preco}"
 
-            break
+    if link:
+        alerta += f"\n🔗 Link:\n{link}"
+
+    # envia alerta
+    await client.send_message("me", alerta)
+
+    # salva mensagem como já enviada
+    mensagens_processadas.add(msg_id)
 
 
-async def main():
+async def iniciar():
+
+    print("🤖 Bot iniciado e monitorando...")
 
     await client.start()
 
-    print("✅ Bot monitorando promoções...")
-
-    while True:
-        try:
-            await client.run_until_disconnected()
-        except Exception:
-            print("⚠ Reconectando...")
-            await asyncio.sleep(5)
+    await client.run_until_disconnected()
 
 
-asyncio.run(main())
+while True:
 
+    try:
 
+        asyncio.run(iniciar())
+
+    except Exception as erro:
+
+        print("⚠ Erro detectado:", erro)
+
+        print("🔄 Reconectando em 5 segundos...")
+
+        asyncio.sleep(5)
