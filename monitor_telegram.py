@@ -4,6 +4,7 @@ import hashlib
 import urllib.parse
 import urllib.request
 import os
+from collections import deque
 
 from telethon import TelegramClient, events
 from telethon.sessions import StringSession
@@ -13,10 +14,6 @@ api_hash = "801694a8767bb74ce2998044ccf111f7"
 
 BOT_TOKEN = "8614974695:AAEYfpkXzmIN-_qgPovELdO8aX8E01TpvGY"
 CHAT_ID = 27139211
-
-# sessão segura via variável de ambiente
-from telethon.sessions import StringSession
-import os
 
 SESSION = os.getenv("TG_SESSION")
 
@@ -58,17 +55,8 @@ PRECOS_MAX = {
     "pasta": 25
 }
 
-mensagens_processadas = set()
-
-# CLIENTE TELEGRAM (SEM ARQUIVO SESSION)
-client = TelegramClient(
-    StringSession(SESSION),
-    api_id,
-    api_hash,
-    connection_retries=None,
-    retry_delay=5,
-    auto_reconnect=True
-)
+# evita crescimento infinito de memória
+mensagens_processadas = deque(maxlen=500)
 
 
 def enviar_alerta(msg):
@@ -80,11 +68,11 @@ def enviar_alerta(msg):
         data = urllib.parse.urlencode({
             "chat_id": CHAT_ID,
             "text": msg
-        }).encode()
+        }).encode("utf-8")
 
         req = urllib.request.Request(url, data=data)
 
-        urllib.request.urlopen(req)
+        urllib.request.urlopen(req, timeout=10)
 
     except Exception as e:
 
@@ -158,6 +146,10 @@ def gerar_hash_promocao(texto):
 @client.on(events.NewMessage)
 async def monitor(event):
 
+    # ❗ evita loop lendo mensagens enviadas pelo próprio bot
+    if event.out:
+        return
+
     mensagem = event.raw_text
 
     if not mensagem:
@@ -188,7 +180,6 @@ async def monitor(event):
                 if preco and preco > PRECOS_MAX[produto]:
                     return
 
-    # usa dados já presentes no evento (não chama API)
     if event.chat:
         nome_grupo = getattr(event.chat, "title", "Chat privado")
         username = getattr(event.chat, "username", None)
@@ -220,7 +211,7 @@ async def monitor(event):
 
     enviar_alerta(alerta)
 
-    mensagens_processadas.add(promo_hash)
+    mensagens_processadas.append(promo_hash)
 
 
 async def main():
@@ -235,5 +226,3 @@ async def main():
 if __name__ == "__main__":
 
     asyncio.run(main())
-
-
