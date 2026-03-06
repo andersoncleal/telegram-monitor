@@ -1,7 +1,6 @@
 import asyncio
 import re
 import hashlib
-import time
 import urllib.parse
 import urllib.request
 from telethon import TelegramClient, events
@@ -40,16 +39,16 @@ PRECOS_MAX = {
 
 mensagens_processadas = set()
 
+# sessão criada apenas no container
 client = TelegramClient(
-    "monitor",
+    "railway_session",
     api_id,
     api_hash,
-    connection_retries=10,
+    connection_retries=None,
     retry_delay=5
 )
 
 
-# ENVIO DE ALERTA SEM REQUESTS
 def enviar_alerta(msg):
 
     try:
@@ -198,7 +197,7 @@ async def monitor(event):
     mensagens_processadas.add(promo_hash)
 
 
-async def iniciar():
+async def main():
 
     print("🤖 Bot iniciado e monitorando...")
 
@@ -207,16 +206,6 @@ async def iniciar():
     await client.run_until_disconnected()
 
 
-while True:
+if __name__ == "__main__":
 
-    try:
-
-        asyncio.run(iniciar())
-
-    except Exception as erro:
-
-        print("⚠ Erro detectado:", erro)
-
-        print("🔄 Reconectando em 5 segundos...")
-
-        time.sleep(5)
+    asyncio.run(main())
