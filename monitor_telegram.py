@@ -16,6 +16,17 @@ USAR_FILTRO_PRECO = False
 CONJUNTOS = [
     ["bug"],
     ["corre"],
+    ["corree"],
+    ["correee"],
+    ["correeee"],
+    ["correeeee"],
+    ["correeeeee"],
+    ["correeeeeee"],
+    ["correeeeeeee"],
+    ["correeeeeeeee"],
+    ["correeeeeeeeee"],
+    ["correeeeeeeeeee"],
+    ["correeeeeeeeeeee"],
     ["whey", "100%"],
     ["jordan"]
 ]
@@ -208,3 +219,4 @@ while True:
         print("🔄 Reconectando em 5 segundos...")
 
         time.sleep(5)
+
