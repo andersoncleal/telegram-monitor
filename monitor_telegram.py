@@ -15,7 +15,22 @@ BOT_TOKEN = "8614974695:AAEYfpkXzmIN-_qgPovELdO8aX8E01TpvGY"
 CHAT_ID = 27139211
 
 # sessão segura via variável de ambiente
+from telethon.sessions import StringSession
+import os
+
 SESSION = os.getenv("TG_SESSION")
+
+if not SESSION:
+    raise Exception("TG_SESSION não encontrada nas variáveis do Railway")
+
+client = TelegramClient(
+    StringSession(SESSION),
+    api_id,
+    api_hash,
+    connection_retries=None,
+    retry_delay=5,
+    auto_reconnect=True
+)
 
 USAR_FILTRO_PRECO = False
 
@@ -220,4 +235,5 @@ async def main():
 if __name__ == "__main__":
 
     asyncio.run(main())
+
 
