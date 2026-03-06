@@ -4,7 +4,6 @@ import hashlib
 import urllib.parse
 import urllib.request
 import os
-
 from telethon import TelegramClient, events
 from telethon.sessions import StringSession
 
@@ -53,6 +52,14 @@ PRECOS_MAX = {
     "creatina": 90,
     "pasta": 25
 }
+
+# -------- NOVO BLOCO ADICIONADO --------
+PALAVRAS_IGNORAR = [
+    "iphone",
+    "olimpikus",
+    "macbook"
+]
+# --------------------------------------
 
 mensagens_processadas = set()
 
@@ -136,6 +143,19 @@ def verificar_palavras(texto):
     return None
 
 
+# -------- NOVA FUNÇÃO ADICIONADA --------
+def contem_palavra_ignorada(texto):
+
+    texto = texto.lower()
+
+    for palavra in PALAVRAS_IGNORAR:
+        if palavra in texto:
+            return True
+
+    return False
+# ----------------------------------------
+
+
 @client.on(events.NewMessage)
 async def monitor(event):
 
@@ -161,6 +181,11 @@ async def monitor(event):
 
     if not mensagem:
         return
+
+    # -------- NOVA VERIFICAÇÃO ADICIONADA --------
+    if contem_palavra_ignorada(mensagem):
+        return
+    # --------------------------------------------
 
     conjunto = verificar_palavras(mensagem)
 
@@ -232,4 +257,3 @@ async def main():
 if __name__ == "__main__":
 
     asyncio.run(main())
-
