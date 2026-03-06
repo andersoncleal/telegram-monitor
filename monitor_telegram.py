@@ -166,7 +166,7 @@ async def monitor(event):
                 if preco and preco > PRECOS_MAX[produto]:
                     return
 
-    chat = await event.get_chat()
+    nome_grupo = event.chat.title if event.chat else "Chat privado"
 
     nome_grupo = getattr(chat, "title", "Chat privado")
 
@@ -209,4 +209,5 @@ async def main():
 if __name__ == "__main__":
 
     asyncio.run(main())
+
 
