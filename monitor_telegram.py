@@ -4,7 +4,6 @@ import hashlib
 import urllib.parse
 import urllib.request
 import os
-from collections import deque
 
 from telethon import TelegramClient, events
 from telethon.sessions import StringSession
@@ -55,8 +54,8 @@ PRECOS_MAX = {
     "pasta": 25
 }
 
-# evita crescimento infinito de memória
-mensagens_processadas = deque(maxlen=500)
+# controle de mensagens já processadas
+mensagens_processadas = set()
 
 
 def enviar_alerta(msg):
@@ -134,30 +133,22 @@ def verificar_palavras(texto):
     return None
 
 
-def gerar_hash_promocao(texto):
-
-    texto = texto.lower().strip()
-
-    texto = re.sub(r"\s+", " ", texto)
-
-    return hashlib.md5(texto.encode()).hexdigest()
-
-
 @client.on(events.NewMessage)
 async def monitor(event):
 
-    # ❗ evita loop lendo mensagens enviadas pelo próprio bot
+    # evita loop com mensagens do próprio bot
     if event.out:
+        return
+
+    # identifica mensagem única
+    msg_id = f"{event.chat_id}-{event.id}"
+
+    if msg_id in mensagens_processadas:
         return
 
     mensagem = event.raw_text
 
     if not mensagem:
-        return
-
-    promo_hash = gerar_hash_promocao(mensagem)
-
-    if promo_hash in mensagens_processadas:
         return
 
     conjunto = verificar_palavras(mensagem)
@@ -211,7 +202,8 @@ async def monitor(event):
 
     enviar_alerta(alerta)
 
-    mensagens_processadas.append(promo_hash)
+    # marca mensagem como processada
+    mensagens_processadas.add(msg_id)
 
 
 async def main():
