@@ -27,7 +27,7 @@ client = TelegramClient(
     auto_reconnect=True
 )
 
-USAR_FILTRO_PRECO = true
+USAR_FILTRO_PRECO = True
 
 CONJUNTOS = [
     ["bug"],
@@ -258,5 +258,6 @@ async def main():
 if __name__ == "__main__":
 
     asyncio.run(main())
+
 
 
