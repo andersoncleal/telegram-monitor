@@ -139,21 +139,22 @@ def verificar_palavras(texto):
 @client.on(events.NewMessage)
 async def monitor(event):
 
-    # 1️⃣ ignora mensagens do próprio chat do bot
-    if event.chat_id == CHAT_ID:
+    # apenas grupos e canais
+    if not event.is_group and not event.is_channel:
         return
 
-    # 2️⃣ ignora mensagens editadas
-    if event.message.edit_date:
-        return
-
-    # evita loop com mensagens enviadas pelo próprio cliente
+    # ignora mensagens enviadas por você
     if event.out:
         return
 
-    msg_id = f"{event.chat_id}-{event.id}"
+    # ignora mensagens editadas
+    if event.message.edit_date:
+        return
 
-    if msg_id in mensagens_processadas:
+    # ID único da mensagem
+    msg_uid = (event.chat_id, event.id)
+
+    if msg_uid in mensagens_processadas:
         return
 
     mensagem = event.raw_text
@@ -182,10 +183,10 @@ async def monitor(event):
                     return
 
     if event.chat:
-        nome_grupo = getattr(event.chat, "title", "Chat privado")
+        nome_grupo = getattr(event.chat, "title", "Canal")
         username = getattr(event.chat, "username", None)
     else:
-        nome_grupo = "Chat privado"
+        nome_grupo = "Canal"
         username = None
 
     link = ""
@@ -212,7 +213,11 @@ async def monitor(event):
 
     enviar_alerta(alerta)
 
-    mensagens_processadas.add(msg_id)
+    mensagens_processadas.add(msg_uid)
+
+    # limpa memória
+    if len(mensagens_processadas) > 5000:
+        mensagens_processadas.clear()
 
 
 async def main():
@@ -227,3 +232,4 @@ async def main():
 if __name__ == "__main__":
 
     asyncio.run(main())
+
