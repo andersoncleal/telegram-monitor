@@ -54,13 +54,16 @@ PRECOS_MAX = {
     "pasta": 25
 }
 
-# controle de mensagens já processadas
 mensagens_processadas = set()
 
 
 def enviar_alerta(msg):
 
     try:
+
+        # limite máximo telegram
+        if len(msg) > 4000:
+            msg = msg[:4000]
 
         url = f"https://api.telegram.org/bot{BOT_TOKEN}/sendMessage"
 
@@ -136,14 +139,18 @@ def verificar_palavras(texto):
 @client.on(events.NewMessage)
 async def monitor(event):
 
-    # ignora mensagens do chat onde o bot envia alertas
+    # 1️⃣ ignora mensagens do próprio chat do bot
     if event.chat_id == CHAT_ID:
-    return
-    # evita loop com mensagens do próprio bot
+        return
+
+    # 2️⃣ ignora mensagens editadas
+    if event.message.edit_date:
+        return
+
+    # evita loop com mensagens enviadas pelo próprio cliente
     if event.out:
         return
 
-    # identifica mensagem única
     msg_id = f"{event.chat_id}-{event.id}"
 
     if msg_id in mensagens_processadas:
@@ -205,7 +212,6 @@ async def monitor(event):
 
     enviar_alerta(alerta)
 
-    # marca mensagem como processada
     mensagens_processadas.add(msg_id)
 
 
@@ -221,4 +227,3 @@ async def main():
 if __name__ == "__main__":
 
     asyncio.run(main())
-
