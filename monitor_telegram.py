@@ -27,10 +27,11 @@ client = TelegramClient(
     connection_retries=None,
     retry_delay=5,
     auto_reconnect=True,
-    device_model="RailwayBot",
-    system_version="1.0",
     timeout=30,
-    receive_updates=True
+    receive_updates=True,
+    device_model="Samsung Galaxy S23",
+    system_version="Android 14",
+    app_version="10.5"
 )
 
 USAR_FILTRO_PRECO = True
@@ -264,6 +265,7 @@ async def main():
 if __name__ == "__main__":
 
     asyncio.run(main())
+
 
 
 
