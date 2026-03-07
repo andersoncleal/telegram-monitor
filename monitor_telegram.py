@@ -6,6 +6,7 @@ import urllib.request
 import os
 from telethon import TelegramClient, events
 from telethon.sessions import StringSession
+from telethon.network.connection.tcpabridged import ConnectionTcpAbridged
 
 api_id = 39830316
 api_hash = "801694a8767bb74ce2998044ccf111f7"
@@ -22,9 +23,14 @@ client = TelegramClient(
     StringSession(SESSION),
     api_id,
     api_hash,
+    connection=ConnectionTcpAbridged,
     connection_retries=None,
     retry_delay=5,
-    auto_reconnect=True
+    auto_reconnect=True,
+    device_model="RailwayBot",
+    system_version="1.0",
+    timeout=30,
+    receive_updates=True
 )
 
 USAR_FILTRO_PRECO = True
@@ -258,6 +264,7 @@ async def main():
 if __name__ == "__main__":
 
     asyncio.run(main())
+
 
 
 
