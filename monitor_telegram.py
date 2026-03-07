@@ -164,7 +164,7 @@ def contem_palavra_ignorada(texto):
 # ----------------------------------------
 
 
-@client.on(events.NewMessage)
+@client.on(events.NewMessage(incoming=True))
 async def monitor(event):
 
     # apenas grupos e canais
@@ -265,6 +265,7 @@ async def main():
 if __name__ == "__main__":
 
     asyncio.run(main())
+
 
 
 
