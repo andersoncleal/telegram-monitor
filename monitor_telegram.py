@@ -257,14 +257,24 @@ async def main():
 
     print("🤖 Bot iniciado e monitorando...")
 
-    await client.start()
+    while True:
 
-    await client.run_until_disconnected()
+        try:
 
+            await client.start()
 
-if __name__ == "__main__":
+            print("✅ Conectado ao Telegram")
 
-    asyncio.run(main())
+            await client.run_until_disconnected()
+
+        except Exception as e:
+
+            print("⚠️ Conexão perdida:", e)
+
+            print("🔄 Tentando reconectar em 10 segundos...")
+
+            await asyncio.sleep(10)
+
 
 
 
