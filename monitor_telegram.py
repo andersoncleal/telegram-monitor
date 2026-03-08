@@ -34,7 +34,7 @@ client = TelegramClient(
     app_version="10.5"
 )
 
-USAR_FILTRO_PRECO = False
+USAR_FILTRO_PRECO = True
 
 CONJUNTOS = [
     ["bug"],
@@ -70,6 +70,7 @@ PALAVRAS_IGNORAR = [
 # --------------------------------------
 
 mensagens_processadas = set()
+promocoes_detectadas = set()
 
 
 def enviar_alerta(msg):
@@ -151,6 +152,15 @@ def verificar_palavras(texto):
     return None
 
 
+def gerar_hash_promocao(texto):
+
+    texto = texto.lower()
+
+    texto = re.sub(r'\s+', ' ', texto)
+
+    return hashlib.md5(texto.encode()).hexdigest()
+
+
 # -------- NOVA FUNÇÃO ADICIONADA --------
 def contem_palavra_ignorada(texto):
 
@@ -189,6 +199,11 @@ async def monitor(event):
 
     if not mensagem:
         return
+        
+hash_promo = gerar_hash_promocao(mensagem)
+
+    if hash_promo in promocoes_detectadas:
+    return
 
     # -------- NOVA VERIFICAÇÃO ADICIONADA --------
     if contem_palavra_ignorada(mensagem):
@@ -246,7 +261,12 @@ async def monitor(event):
 
     enviar_alerta(alerta)
 
-    mensagens_processadas.add(msg_uid)
+promocoes_detectadas.add(hash_promo)
+
+    if len(promocoes_detectadas) > 5000:
+        promocoes_detectadas.clear()
+
+        mensagens_processadas.add(msg_uid)
 
     # limpa memória
     if len(mensagens_processadas) > 5000:
@@ -278,6 +298,7 @@ async def main():
 
 if __name__ == "__main__":
     asyncio.run(main())
+
 
 
 
