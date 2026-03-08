@@ -11,8 +11,8 @@ from telethon.network.connection.tcpabridged import ConnectionTcpAbridged
 api_id = 39830316
 api_hash = "801694a8767bb74ce2998044ccf111f7"
 
-BOT_TOKEN = "8614974695:AAEYfpkXzmIN-_qgPovELdO8aX8E01TpvGY"
-CHAT_ID = 27139211
+BOT_TOKEN = "8785139630:AAGeXw7AQDa0TgH9ce1wSFeVcSTfXICjuc8"
+CHAT_ID = 8604120421
 
 SESSION = os.getenv("TG_SESSION")
 
@@ -274,6 +274,7 @@ async def main():
             print("🔄 Tentando reconectar em 10 segundos...")
 
             await asyncio.sleep(10)
+
 
 
 
