@@ -62,12 +62,14 @@ CONJUNTOS = [
     ["correeeeeeeeeeeeeeeeeeeeee"],
     ["whey", "100%"],
     ["jordan"],
-    ["dux"]
+    ["dux"],
+    ["camiseta", "nike"]
 ]
 
 PRECOS_MAX = {
     "creatina": 40,
-    "jordan": 400
+    "jordan": 400,
+    "camiseta": 80
 }
 
 # -------- NOVO BLOCO ADICIONADO --------
@@ -311,6 +313,7 @@ async def main():
 
 if __name__ == "__main__":
     asyncio.run(main())
+
 
 
 
