@@ -195,7 +195,10 @@ async def monitor(event):
     if msg_uid in mensagens_processadas:
         return
 
-   mensagem = event.raw_text
+    mensagem = event.raw_text
+
+    if not mensagem:
+        return
 
     if not mensagem:
         return
@@ -298,6 +301,7 @@ async def main():
 
 if __name__ == "__main__":
     asyncio.run(main())
+
 
 
 
