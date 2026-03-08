@@ -61,11 +61,11 @@ CONJUNTOS = [
     ["correeeeeeeeeeeeeeeeeeeee"],
     ["correeeeeeeeeeeeeeeeeeeeee"],
     ["whey", "100%"],
-    ["jordan"]
+    ["jordan"],
+    ["dux"]
 ]
 
 PRECOS_MAX = {
-    "whey": 85,
     "creatina": 40,
     "jordan": 400
 }
@@ -311,6 +311,7 @@ async def main():
 
 if __name__ == "__main__":
     asyncio.run(main())
+
 
 
 
