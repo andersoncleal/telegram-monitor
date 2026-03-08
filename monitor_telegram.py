@@ -195,15 +195,15 @@ async def monitor(event):
     if msg_uid in mensagens_processadas:
         return
 
-    mensagem = event.raw_text
+   mensagem = event.raw_text
 
     if not mensagem:
         return
-        
-hash_promo = gerar_hash_promocao(mensagem)
+
+    hash_promo = gerar_hash_promocao(mensagem)
 
     if hash_promo in promocoes_detectadas:
-    return
+        return
 
     # -------- NOVA VERIFICAÇÃO ADICIONADA --------
     if contem_palavra_ignorada(mensagem):
@@ -261,12 +261,12 @@ hash_promo = gerar_hash_promocao(mensagem)
 
     enviar_alerta(alerta)
 
-promocoes_detectadas.add(hash_promo)
+    promocoes_detectadas.add(hash_promo)
 
     if len(promocoes_detectadas) > 5000:
         promocoes_detectadas.clear()
 
-        mensagens_processadas.add(msg_uid)
+    mensagens_processadas.add(msg_uid)
 
     # limpa memória
     if len(mensagens_processadas) > 5000:
@@ -298,6 +298,7 @@ async def main():
 
 if __name__ == "__main__":
     asyncio.run(main())
+
 
 
 
