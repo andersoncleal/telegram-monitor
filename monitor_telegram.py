@@ -1,4 +1,3 @@
-print("SCRIPT INICIADO")
 import asyncio
 import re
 import hashlib
@@ -275,6 +274,11 @@ async def main():
             print("🔄 Tentando reconectar em 10 segundos...")
 
             await asyncio.sleep(10)
+
+
+if __name__ == "__main__":
+    asyncio.run(main())
+
 
 
 
