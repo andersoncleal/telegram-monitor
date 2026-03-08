@@ -111,24 +111,35 @@ def enviar_alerta(msg):
 
 def extrair_preco(texto):
 
-    regex = r'(?:R\$|r\$)\s?\d+[.,]?\d*'
+    texto = texto.lower()
 
-    match = re.search(regex, texto)
+    padroes = [
+        r'por\s+r\$\s*(\d+[.,]?\d*)',
+        r'apenas\s+r\$\s*(\d+[.,]?\d*)',
+        r'r\$\s*(\d+[.,]?\d*)\s*(?:no pix|à vista)',
+        r'de\s+r\$\s*\d+[.,]?\d*\s*por\s*r\$\s*(\d+[.,]?\d*)',
+        r'🔥\s*r\$\s*(\d+[.,]?\d*)'
+    ]
 
-    if match:
+    precos = []
 
-        valor = match.group()
+    for padrao in padroes:
 
-        valor = valor.replace("R$", "").replace("r$", "").strip()
+        matches = re.findall(padrao, texto)
 
-        valor = valor.replace(",", ".")
+        for valor in matches:
 
-        try:
-            return float(valor)
-        except:
-            return None
+            valor = valor.replace(",", ".")
 
-    return None
+            try:
+                precos.append(float(valor))
+            except:
+                pass
+
+    if not precos:
+        return None
+
+    return min(precos)
 
 
 def normalizar_texto(texto):
@@ -313,6 +324,7 @@ async def main():
 
 if __name__ == "__main__":
     asyncio.run(main())
+
 
 
 
