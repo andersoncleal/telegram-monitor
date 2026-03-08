@@ -50,7 +50,16 @@ CONJUNTOS = [
     ["correeeeeeeeee"],
     ["correeeeeeeeeee"],
     ["correeeeeeeeeeee"],
-    ["nike"],
+    ["correeeeeeeeeeeee"],
+    ["correeeeeeeeeeeeee"],
+    ["correeeeeeeeeeeeeee"],
+    ["correeeeeeeeeeeeeeee"],
+    ["correeeeeeeeeeeeeeeee"],
+    ["correeeeeeeeeeeeeeeeee"],
+    ["correeeeeeeeeeeeeeeeeee"],
+    ["correeeeeeeeeeeeeeeeeeee"],
+    ["correeeeeeeeeeeeeeeeeeeee"],
+    ["correeeeeeeeeeeeeeeeeeeeee"],
     ["whey", "100%"],
     ["jordan"]
 ]
@@ -302,6 +311,7 @@ async def main():
 
 if __name__ == "__main__":
     asyncio.run(main())
+
 
 
 
