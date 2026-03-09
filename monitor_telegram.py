@@ -79,7 +79,8 @@ PALAVRAS_IGNORAR = [
     "iphone",
     "olympikus",
     "olimpikys",
-    "macbook"
+    "macbook",
+    "x de R$"
 ]
 # --------------------------------------
 
@@ -326,6 +327,7 @@ async def main():
 
 if __name__ == "__main__":
     asyncio.run(main())
+
 
 
 
