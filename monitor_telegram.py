@@ -65,7 +65,8 @@ CONJUNTOS = [
     ["dux"],
     ["camiseta", "nike"],
     ["folha", "tripla"],
-    ["preco", "absurdo"]
+    ["preco", "absurdo"],
+    ["polishop]
 ]
 
 PRECOS_MAX = {
@@ -79,8 +80,7 @@ PALAVRAS_IGNORAR = [
     "iphone",
     "olympikus",
     "olimpikys",
-    "macbook",
-    "x de R$"
+    "macbook"
 ]
 # --------------------------------------
 
