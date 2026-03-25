@@ -91,7 +91,10 @@ PALAVRAS_IGNORAR = [
     "olympikus",
     "olimpikys",
     "macbook",
-    "dark lab"
+    "dark lab",
+    "celular",
+    "Galaxy","S24",
+    "Galaxy","S25"
 ]
 # --------------------------------------
 
