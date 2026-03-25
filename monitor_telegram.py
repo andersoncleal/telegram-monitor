@@ -93,6 +93,7 @@ PALAVRAS_IGNORAR = [
     "macbook",
     "dark lab",
     "celular",
+    "Smartphone",
     "Galaxy","S24",
     "Galaxy","S25",
     "Galaxy","S26"
