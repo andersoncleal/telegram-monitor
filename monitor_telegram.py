@@ -94,7 +94,8 @@ PALAVRAS_IGNORAR = [
     "dark lab",
     "celular",
     "Galaxy","S24",
-    "Galaxy","S25"
+    "Galaxy","S25",
+    "Galaxy","S26"
 ]
 # --------------------------------------
 
