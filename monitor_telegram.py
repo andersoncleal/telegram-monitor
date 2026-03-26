@@ -76,7 +76,8 @@ CONJUNTOS = [
     ["folha", "tripla"],
     ["preco", "absurdo"],
     ["panela","polishop"],
-    ["frigideira","polishop"]
+    ["frigideira","polishop"],
+    ["cupom","shopee"]
 ]
 
 PRECOS_MAX = {
