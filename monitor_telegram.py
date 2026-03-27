@@ -38,37 +38,6 @@ USAR_FILTRO_PRECO = True
 
 CONJUNTOS = [
     ["bug"],
-    ["corre"],
-    ["corree"],
-    ["correee"],
-    ["correeee"],
-    ["correeeee"],
-    ["correeeeee"],
-    ["correeeeeee"],
-    ["correeeeeeee"],
-    ["correeeeeeeee"],
-    ["correeeeeeeeee"],
-    ["correeeeeeeeeee"],
-    ["correeeeeeeeeeee"],
-    ["correeeeeeeeeeeee"],
-    ["correeeeeeeeeeeeee"],
-    ["correeeeeeeeeeeeeee"],
-    ["correeeeeeeeeeeeeeee"],
-    ["correeeeeeeeeeeeeeeee"],
-    ["correeeeeeeeeeeeeeeeee"],
-    ["correeeeeeeeeeeeeeeeeee"],
-    ["correeeeeeeeeeeeeeeeeeee"],
-    ["correeeeeeeeeeeeeeeeeeeee"],
-    ["correeeeeeeeeeeeeeeeeeeeee"],
-    ["coorre"],
-    ["cooorre"],
-    ["coooorre"],
-    ["cooooorre"],
-    ["coooooorre"],
-    ["cooooooorre"],
-    ["coooooooorre"],
-    ["cooooooooorre"],
-    ["coooooooooorre"],
     ["whey", "100%"],
     ["jordan"],
     ["dux"],
@@ -176,7 +145,9 @@ def verificar_palavras(texto):
 
     texto = normalizar_texto(texto)
 
-    palavras_texto = texto.split()
+    # 🔥 Detecta qualquer variação de "corre"
+    if re.search(r'co+r+e+', texto):
+        return ["corre"]
 
     for conjunto in CONJUNTOS:
 
@@ -184,7 +155,8 @@ def verificar_palavras(texto):
 
         for palavra in conjunto:
 
-            if palavra.lower() not in palavras_texto:
+            # ✅ agora busca no texto inteiro, não só palavra isolada
+            if palavra.lower() not in texto:
                 encontrou = False
                 break
 
