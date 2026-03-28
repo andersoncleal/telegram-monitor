@@ -146,7 +146,7 @@ def verificar_palavras(texto):
     texto = normalizar_texto(texto)
 
     # 🔥 Detecta qualquer variação de "corre"
-    if re.search(r'\bco+r+e+\b', texto):
+    if re.search(r'\bco+r{2,}e+\b', texto):
         return ["corre"]
 
     for conjunto in CONJUNTOS:
