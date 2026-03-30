@@ -45,13 +45,15 @@ CONJUNTOS = [
     ["folha", "tripla"],
     ["preco", "absurdo"],
     ["panela","polishop"],
-    ["frigideira","polishop"]
+    ["frigideira","polishop"],
+    ["Confort" "Sec"]
 ]
 
 PRECOS_MAX = {
     "creatina": 40,
     "jordan": 400,
-    "camiseta": 80
+    "camiseta": 80,
+    "Pampers": 60
 }
 
 # -------- NOVO BLOCO ADICIONADO --------
