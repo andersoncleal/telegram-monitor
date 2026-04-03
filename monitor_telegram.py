@@ -52,9 +52,8 @@ CONJUNTOS = [
 PRECOS_MAX = {
     "creatina": 40,
     "jordan": 400,
-    "camiseta": 80,
+    "camiseta": 70,
     "Pampers": 60,
-    "camiseta" "nike": 70
 }
 
 # -------- NOVO BLOCO ADICIONADO --------
