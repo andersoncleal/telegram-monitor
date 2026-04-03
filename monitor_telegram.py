@@ -52,7 +52,7 @@ CONJUNTOS = [
 PRECOS_MAX = {
     "creatina": 40,
     "jordan": 400,
-    "camiseta": 70,
+    "camiseta" "nike": 70,
     "Pampers": 60,
 }
 
