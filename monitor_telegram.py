@@ -53,7 +53,8 @@ PRECOS_MAX = {
     "creatina": 40,
     "jordan": 400,
     "camiseta": 80,
-    "Pampers": 60
+    "Pampers": 60,
+    "camiseta" "nike": 70
 }
 
 # -------- NOVO BLOCO ADICIONADO --------
