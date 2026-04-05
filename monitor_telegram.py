@@ -161,7 +161,9 @@ async def monitor(event):
         return
 
     mensagem = event.raw_text
-print("📩 Nova mensagem:", mensagem)
+
+    print("📩 Nova mensagem:", mensagem)
+
     if not mensagem:
         return
 
