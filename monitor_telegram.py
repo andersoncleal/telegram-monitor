@@ -162,7 +162,7 @@ async def monitor(event):
 
     mensagem = event.raw_text
 
-    print("📩 Nova mensagem:", mensagem)
+    print("📩 MSG:", mensagem)
 
     if not mensagem:
         return
