@@ -13,11 +13,11 @@ from telethon.network.connection.tcpabridged import ConnectionTcpAbridged
 api_id = 39830316
 api_hash = "801694a8767bb74ce2998044ccf111f7"
 
-BOT_TOKEN = "SEU_BOT_TOKEN_AQUI"
-CHAT_ID = SEU_CHAT_ID_AQUI
+BOT_TOKEN = "8785139630:AAGeXw7AQDa0TgH9ce1wSFeVcSTfXICjuc8"
+CHAT_ID = 8604120421
 
 # ===== SESSION (CORRIGIDO PRO FLY) =====
-SESSION = os.getenv("TG_SESSION")
+SESSION = os.getenv("1AZWarzsBu7Vobp2BA9wQZzaccn4UEctsKvXfqJDU16Q24pOgZbXt8OgNW6lmVA_0C5DmNFm2xPRtO0-Ctm6L7PIyJaPqbrhzmukPGaUJyVxgM5vylWlo1iXdPhA_Ux8KJ-tP_slzrcNb7x329Adk8QVSh1c4pdu4TOkCCpxu09i_dcUaxK3VuIp1Tm4LXnXFb99_-m57cv6vD7vByxfOLvZN0ifuucS1gHpucdSMzRg2YD7bZhjsYiYawxxL6k0OZhXzLOMvlRqNOg91tr5V4QcM3dOAOVdv00hfnSCUfNnTj08GaE2CKvR9uy1fjPlvuilnFkwhDOUZpFTLXfAk5ZsKBsqbMrw=")
 
 print("SESSION:", SESSION)
 
