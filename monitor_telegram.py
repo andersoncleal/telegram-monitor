@@ -4,6 +4,8 @@ import hashlib
 import urllib.parse
 import urllib.request
 import os
+import time
+
 from telethon import TelegramClient, events
 from telethon.sessions import StringSession
 from telethon.network.connection.tcpabridged import ConnectionTcpAbridged
@@ -11,27 +13,30 @@ from telethon.network.connection.tcpabridged import ConnectionTcpAbridged
 api_id = 39830316
 api_hash = "801694a8767bb74ce2998044ccf111f7"
 
-BOT_TOKEN = "8785139630:AAGeXw7AQDa0TgH9ce1wSFeVcSTfXICjuc8"
-CHAT_ID = 8604120421
+BOT_TOKEN = "SEU_BOT_TOKEN_AQUI"
+CHAT_ID = SEU_CHAT_ID_AQUI
 
+# ===== SESSION (CORRIGIDO PRO FLY) =====
 SESSION = os.getenv("TG_SESSION")
 
-if not SESSION:
-    raise Exception("TG_SESSION não encontrada nas variáveis do Railway")
+print("SESSION:", SESSION)
 
+if not SESSION:
+    print("⚠️ TG_SESSION não encontrada... aguardando 5s...")
+    time.sleep(5)
+    SESSION = os.getenv("TG_SESSION")
+
+    if not SESSION:
+        raise Exception("❌ TG_SESSION não carregou no ambiente")
+
+# ===== CLIENT =====
 client = TelegramClient(
     StringSession(SESSION),
     api_id,
     api_hash,
     connection=ConnectionTcpAbridged,
-    connection_retries=None,
-    retry_delay=5,
     auto_reconnect=True,
-    timeout=30,
-    receive_updates=True,
-    device_model="Samsung Galaxy S23",
-    system_version="Android 14",
-    app_version="10.5"
+    timeout=30
 )
 
 USAR_FILTRO_PRECO = True
@@ -44,42 +49,33 @@ CONJUNTOS = [
     ["camiseta", "nike"],
     ["folha", "tripla"],
     ["preco", "absurdo"],
-    ["panela","polishop"],
-    ["frigideira","polishop"],
-    ["Confort" "Sec"]
+    ["panela", "polishop"],
+    ["frigideira", "polishop"],
+    ["confort", "sec"]
 ]
 
 PRECOS_MAX = {
     "creatina": 40,
     "jordan": 400,
-    "camiseta" "nike": 70,
-    "Pampers": 60,
+    "camiseta nike": 70,
+    "pampers": 60
 }
 
-# -------- NOVO BLOCO ADICIONADO --------
 PALAVRAS_IGNORAR = [
     "iphone",
     "olympikus",
-    "olimpikys",
     "macbook",
-    "dark lab",
     "celular",
     "smartphone",
-    "galaxy","S24",
-    "galaxy","S25",
-    "galaxy","S26"
+    "galaxy",
 ]
-# --------------------------------------
 
 mensagens_processadas = set()
 promocoes_detectadas = set()
 
-
+# ===== ALERTA =====
 def enviar_alerta(msg):
-
     try:
-
-        # limite máximo telegram
         if len(msg) > 4000:
             msg = msg[:4000]
 
@@ -90,17 +86,13 @@ def enviar_alerta(msg):
             "text": msg
         }).encode("utf-8")
 
-        req = urllib.request.Request(url, data=data)
-
-        urllib.request.urlopen(req, timeout=10)
+        urllib.request.urlopen(url, data=data, timeout=10)
 
     except Exception as e:
-
         print("Erro ao enviar alerta:", e)
 
-
+# ===== PREÇO =====
 def extrair_preco(texto):
-
     texto = texto.lower()
 
     padroes = [
@@ -108,114 +100,67 @@ def extrair_preco(texto):
         r'apenas\s+r\$\s*(\d+[.,]?\d*)',
         r'r\$\s*(\d+[.,]?\d*)\s*(?:no pix|à vista)',
         r'de\s+r\$\s*\d+[.,]?\d*\s*por\s*r\$\s*(\d+[.,]?\d*)',
-        r'🔥\s*r\$\s*(\d+[.,]?\d*)'
     ]
 
     precos = []
 
     for padrao in padroes:
-
         matches = re.findall(padrao, texto)
-
         for valor in matches:
-
-            valor = valor.replace(",", ".")
-
             try:
-                precos.append(float(valor))
+                precos.append(float(valor.replace(",", ".")))
             except:
                 pass
 
-    if not precos:
-        return None
+    return min(precos) if precos else None
 
-    return min(precos)
-
-
+# ===== TEXTO =====
 def normalizar_texto(texto):
-
     texto = texto.lower()
-
     texto = re.sub(r"[^\w\s%$]", " ", texto)
-
     texto = re.sub(r"\s+", " ", texto)
-
     return texto.strip()
 
-
+# ===== PALAVRAS =====
 def verificar_palavras(texto):
-
     texto = normalizar_texto(texto)
 
-    # 🔥 Detecta qualquer variação de "corre"
+    # corre / correeeee
     if re.search(r'\bco+r{2,}e+\b', texto):
         return ["corre"]
 
     for conjunto in CONJUNTOS:
-
-        encontrou = True
-
-        for palavra in conjunto:
-
-            # ✅ agora busca no texto inteiro, não só palavra isolada
-            if palavra.lower() not in texto:
-                encontrou = False
-                break
-
-        if encontrou:
+        if all(p in texto for p in conjunto):
             return conjunto
 
     return None
 
-
+# ===== HASH =====
 def gerar_hash_promocao(texto):
-
-    texto = texto.lower()
-
-    texto = re.sub(r'\s+', ' ', texto)
-
+    texto = re.sub(r'\s+', ' ', texto.lower())
     return hashlib.md5(texto.encode()).hexdigest()
 
-
-# -------- NOVA FUNÇÃO ADICIONADA --------
+# ===== IGNORAR =====
 def contem_palavra_ignorada(texto):
-
     texto = texto.lower()
+    return any(p in texto for p in PALAVRAS_IGNORAR)
 
-    for palavra in PALAVRAS_IGNORAR:
-        if palavra in texto:
-            return True
-
-    return False
-# ----------------------------------------
-
-
+# ===== MONITOR =====
 @client.on(events.NewMessage(incoming=True))
 async def monitor(event):
 
-    # apenas grupos e canais
     if not event.is_group and not event.is_channel:
         return
 
-    # ignora mensagens enviadas por você
-    if event.out:
+    if event.out or event.message.edit_date:
         return
 
-    # ignora mensagens editadas
-    if event.message.edit_date:
-        return
-
-    # ID único da mensagem
     msg_uid = (event.chat_id, event.id)
 
     if msg_uid in mensagens_processadas:
         return
 
     mensagem = event.raw_text
-
-    if not mensagem:
-        return
-
     if not mensagem:
         return
 
@@ -224,42 +169,25 @@ async def monitor(event):
     if hash_promo in promocoes_detectadas:
         return
 
-    # -------- NOVA VERIFICAÇÃO ADICIONADA --------
     if contem_palavra_ignorada(mensagem):
         return
-    # --------------------------------------------
 
     conjunto = verificar_palavras(mensagem)
-
     if not conjunto:
         return
 
-    texto = mensagem.lower()
+    preco = extrair_preco(mensagem)
 
-    preco = None
-
-    if USAR_FILTRO_PRECO:
-
-        preco = extrair_preco(mensagem)
-
+    if USAR_FILTRO_PRECO and preco:
+        texto = mensagem.lower()
         for produto in PRECOS_MAX:
+            if produto in texto and preco > PRECOS_MAX[produto]:
+                return
 
-            if produto in texto:
+    nome_grupo = getattr(event.chat, "title", "Canal") if event.chat else "Canal"
+    username = getattr(event.chat, "username", None)
 
-                if preco and preco > PRECOS_MAX[produto]:
-                    return
-
-    if event.chat:
-        nome_grupo = getattr(event.chat, "title", "Canal")
-        username = getattr(event.chat, "username", None)
-    else:
-        nome_grupo = "Canal"
-        username = None
-
-    link = ""
-
-    if username:
-        link = f"https://t.me/{username}/{event.id}"
+    link = f"https://t.me/{username}/{event.id}" if username else ""
 
     alerta = f"""
 🚨 Promoção encontrada
@@ -281,62 +209,14 @@ async def monitor(event):
     enviar_alerta(alerta)
 
     promocoes_detectadas.add(hash_promo)
-
-    if len(promocoes_detectadas) > 5000:
-        promocoes_detectadas.clear()
-
     mensagens_processadas.add(msg_uid)
 
-    # limpa memória
-    if len(mensagens_processadas) > 5000:
-        mensagens_processadas.clear()
-
-
+# ===== MAIN =====
 async def main():
-
-    print("🤖 Bot iniciado e monitorando...")
-
-    while True:
-
-        try:
-
-            await client.start()
-
-            print("✅ Conectado ao Telegram")
-
-            await client.run_until_disconnected()
-
-        except Exception as e:
-
-            print("⚠️ Conexão perdida:", e)
-
-            print("🔄 Tentando reconectar em 10 segundos...")
-
-            await asyncio.sleep(10)
-
+    print("🤖 Bot iniciado...")
+    await client.start()
+    print("✅ Conectado ao Telegram")
+    await client.run_until_disconnected()
 
 if __name__ == "__main__":
     asyncio.run(main())
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
